@@ -92,6 +92,10 @@ abstract class Connection
 	{
 		$config = Config::instance();
 
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			self::$datetime_format = 'Y-m-d H:i:s';
+		}
+
 		if (strpos($connection_string_or_connection_name, '://') === false)
 		{
 			$connection_string = $connection_string_or_connection_name ?
