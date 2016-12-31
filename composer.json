@@ -13,7 +13,7 @@
     },
     "replace": {
       "php-activerecord": "*"
-    }
+    },
     "require-dev": {
         "phpunit/phpunit": "4.*",
         "pear/pear_exception": "1.0-beta1",
