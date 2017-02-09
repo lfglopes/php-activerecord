@@ -1629,6 +1629,12 @@ class Model
     {
         $options['query_info'] = true;
         
+        $limitOption = isset($options['limit']) ? intval($options['limit']) : 0;
+        $offsetOption = isset($options['offset']) ? intval($options['offset']) : 0;
+        
+        unset($options['limit']);
+        unset($options['offset']);
+        
         // Execute regular find function and get the prebuilt query, ready for find_by_sql
         $findQueryInfo = self::find('all', $options);
         
@@ -1641,8 +1647,14 @@ class Model
         $findQueryString = "SELECT * FROM ({$findQueryString}) AS results";
         
         if ($orderByString) {
-            $findQueryString .= " ORDER BY {$orderByString};";
+            $findQueryString .= " ORDER BY {$orderByString}";
         }
+        
+        if ($limitOption) {
+            $findQueryString .= " LIMIT {$offsetOption}, {$limitOption}";
+        }
+        
+        $findQueryString .= ";";
         
         // Execute actual find
         return static::table()->find_by_sql($findQueryString, $findQueryValues, $findQueryReadOnly, $findQueryEagerLoad);
