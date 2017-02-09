@@ -1618,6 +1618,36 @@ class Model
 		return $single ? (!empty($list) ? $list[0] : null) : $list;
 	}
 
+    /**
+     * Performs a regular "find all", but wraps the results in a separate SELECT for faster sorting on JOIN heavy queries.
+     * 
+     * @param $options
+     * @param string $orderByString
+     * @return array
+     */
+	public static function find_all_with_wrapped_sort($options, $orderByString = 'id desc')
+    {
+        $options['query_info'] = true;
+        
+        // Execute regular find function and get the prebuilt query, ready for find_by_sql
+        $findQueryInfo = self::find('all', $options);
+        
+        $findQueryString = $findQueryInfo['query'];
+        $findQueryValues = $findQueryInfo['values'];
+        $findQueryReadOnly = $findQueryInfo['readonly'];
+        $findQueryEagerLoad = $findQueryInfo['eager_load'];
+        
+        // Modify the query to use a wrap around
+        $findQueryString = "SELECT * FROM ({$findQueryString}) AS results";
+        
+        if ($orderByString) {
+            $findQueryString .= " ORDER BY {$orderByString};";
+        }
+        
+        // Execute actual find
+        return static::table()->find_by_sql($findQueryString, $findQueryValues, $findQueryReadOnly, $findQueryEagerLoad);
+    }
+
 	/**
 	 * Will look up a list of primary keys from cache
 	 *
