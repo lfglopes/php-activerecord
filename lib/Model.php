@@ -1473,6 +1473,47 @@ class Model
 		$values = $sql->get_where_values();
 		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
 	}
+	
+	public static function stupidfastcount(array $options): int
+    {
+        // Select all records with no limit, offset or ordering
+        $options['select'] = '1';
+        
+        unset($options['limit']);
+        unset($options['offset']);
+        unset($options['order']);
+
+        // Execute regular find function and get the prebuilt query, ready for find_by_sql
+        $options['query_info'] = true;
+        $findQueryInfo = self::find('all', $options);
+
+        $findQueryString = $findQueryInfo['query'];
+        $findQueryValues = $findQueryInfo['values'];
+        
+        // Execute the raw SQL and return result set row count
+        /**
+         * @var $query \PDOStatement
+         */
+        $query = self::connection()->query($findQueryString, $findQueryValues);
+        return count($query->fetchAll(\PDO::FETCH_COLUMN));
+    }
+
+    public static function stupidfastquery(array $options): array
+    {
+        // Execute regular find function and get the prebuilt query, ready for find_by_sql
+        $options['query_info'] = true;
+        $findQueryInfo = self::find('all', $options);
+
+        $findQueryString = $findQueryInfo['query'];
+        $findQueryValues = $findQueryInfo['values'];
+
+        // Execute the raw SQL and return result set row count
+        /**
+         * @var $query \PDOStatement
+         */
+        $query = self::connection()->query($findQueryString, $findQueryValues);
+        return $query->fetchAll();
+    }
 
 	/**
 	 * Determine if a record exists.
