@@ -1474,7 +1474,7 @@ class Model
 		return static::connection()->query_and_fetch_one($sql->to_s(),$values);
 	}
 	
-	public static function stupidfastcount(array $options): int
+	public static function stupidfastcount(array $options)
     {
         // Select all records with no limit, offset or ordering
         $options['select'] = '1';
@@ -1498,7 +1498,7 @@ class Model
         return count($query->fetchAll(\PDO::FETCH_COLUMN));
     }
 
-    public static function stupidfastquery(array $options): array
+    public static function stupidfastquery(array $options)
     {
         // Execute regular find function and get the prebuilt query, ready for find_by_sql
         $options['query_info'] = true;
