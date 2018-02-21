@@ -241,6 +241,13 @@ abstract class Connection
 		return $info;
 	}
 
+    /**
+     * Connection info: Array containing URL parts.
+     *
+     * @var array
+     */
+	protected $info;
+
 	/**
 	 * Class Connection is a singleton. Access it via instance().
 	 *
@@ -249,23 +256,42 @@ abstract class Connection
 	 */
 	protected function __construct($info)
 	{
+        $this->info = $info;
+
 		try {
-			// unix sockets start with a /
-			if ($info->host[0] != '/')
-			{
-				$host = "host=$info->host";
-
-				if (isset($info->port))
-					$host .= ";port=$info->port";
-			}
-			else
-				$host = "unix_socket=$info->host";
-
-			$this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+			$this->reconnect();
 		} catch (PDOException $e) {
 			throw new DatabaseException($e);
 		}
 	}
+
+	protected function disconnect()
+    {
+        $this->connection = null;
+        gc_collect_cycles();
+    }
+
+    public function reconnect()
+    {
+        if ($this->connection) {
+            $this->disconnect();
+        }
+
+        $info = $this->info;
+
+        // unix sockets start with a /
+        if ($info->host[0] != '/') {
+            $host = "host=$info->host";
+
+            if (isset($info->port)) {
+                $host .= ";port=$info->port";
+            }
+        } else {
+            $host = "unix_socket=$info->host";
+        }
+
+        $this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+    }
 
 	/**
 	 * Retrieves column meta data for the specified table.
