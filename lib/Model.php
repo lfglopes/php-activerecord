@@ -4,6 +4,8 @@
  */
 namespace ActiveRecord;
 
+use Countable;
+
 /**
  * The base class for your models.
  *
@@ -1733,7 +1735,7 @@ class Model
 	 * @return Model
 	 * @throws {@link RecordNotFound} if a record could not be found
 	 */
-	public static function find_by_pk($values, $options)
+	public static function find_by_pk($values, $options = [])
 	{
 		if($values===null)
 		{
@@ -1754,7 +1756,10 @@ class Model
 		}
 		$results = count($list);
 
-		if ($results != ($expected = count($values)))
+        $valuesIsCountable = is_array($values) || $values instanceof Countable;
+        $valuesCount = $valuesIsCountable ? count($values) : (empty($values) ? 0 : 1);
+
+		if ($results != ($expected = $valuesCount))
 		{
 			$class = get_called_class();
 			if (is_array($values))
