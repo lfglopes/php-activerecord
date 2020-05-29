@@ -215,8 +215,8 @@ class Table
 		$sql = $this->options_to_sql($options);
 		$readonly = (array_key_exists('readonly',$options) && $options['readonly']) ? true : false;
 		$eager_load = array_key_exists('include',$options) ? $options['include'] : null;
-		
-		if ($options['query_info']) {
+
+		if (isset($options['query_info']) && $options['query_info']) {
 		    return [
                 'query' => $sql->to_s(),
                 'values' => $sql->get_where_values(),
@@ -224,7 +224,7 @@ class Table
                 'eager_load' => $eager_load
             ];
         } else {
-            return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);    
+            return $this->find_by_sql($sql->to_s(),$sql->get_where_values(), $readonly, $eager_load);
         }
 	}
 
