@@ -14,7 +14,7 @@ This fork contains some quality-of-life enhancements and fixes that are relevant
 
 We recommend using composer:
 
-    composer require softwarepunt/php-activerecord:dev-master
+    composer require lfglopes/php-activerecord:dev-master
 
 Because we do not actively maintain tags or versions for this project, you should refer to `dev-master`. 
 
